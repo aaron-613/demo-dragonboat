@@ -1,5 +1,6 @@
 # demo-dragonboat
 A simple, fun JavaScript game that uses MQTT to have a dragon boat race
+!(https://github.com/aaron-613/demo-dragonboat/blob/master/gfx/screenshot.png)
 
 # Instructions
 1. Load all the files onto a web server somewhere.
