@@ -2,10 +2,10 @@
 <html>
 <head>
   <title>Aaron's Solace Dragon Boat Demo!</title>
-  <script src="paho-mqtt-min.js" type="text/javascript"></script>
-  <script src="fabric.min.js" type="text/javascript"></script>
-  <script src="shared.js" type="text/javascript"></script>
-  <script src="fontfaceobserver.js"></script>
+  <script src="lib/paho-mqtt-min.js" type="text/javascript"></script>
+  <script src="lib/fabric.min.js" type="text/javascript"></script>
+  <script src="lib/shared.js" type="text/javascript"></script>
+  <script src="lib/fontfaceobserver.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css?family=Luckiest+Guy');
     @import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap');
@@ -55,7 +55,7 @@
 
     // simply draws the Solace logo in the top-right
     function drawLogo() {
-      fabric.Image.fromURL('SolLogo.png', function (img) {
+      fabric.Image.fromURL('gfx/SolLogo.png', function (img) {
         img.scale(0.5).set('top', 10).set('left', w - 200);
         canvas.add(img);
       });
@@ -139,15 +139,15 @@
     var meetID;
     // grab the URL parameters, everything after the '&'
     var params = window.location.search.substring(1).split('&')[0]; // first element of split
-    audioCheer = new Audio('cheer.mp3');
+    audioCheer = new Audio('audio/cheer.mp3');
     if (params !== "") {  // if there's something there...
       mode = 'meet';  // this is a race controller
       meetID = uniqueID;//
-      audioTrumpet = new Audio('winners-trumpet.mp3');  // load the trumpet sound
+      audioTrumpet = new Audio('audio/winners-trumpet.mp3');  // load the trumpet sound
     } else {
       mode = 'boat';  // else, we're a boat/player
-      audioRow = new Audio('row.mp3');
-      audioAwww = new Audio('sad.mp3');
+      audioRow = new Audio('audio/row.mp3');
+      audioAwww = new Audio('audio/sad.mp3');
     }
     canvas.on('mouse:down', function (options) {
       click();
@@ -178,7 +178,7 @@
     boatImg = {};
     for (color in teams) {
       var img = new Image();
-      img.src = "boat" + color + ".png";
+      img.src = "gfx/boat" + color + ".png";
       boatImg[teams[color]] = img;
     }
     var raceID;  // per-race unique ID
