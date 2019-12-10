@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Aaron's Solace Dragon Boat Demo!</title>
+  <script src="paho-mqtt-min.js" type="text/javascript"></script>
+  <script src="fabric.min.js" type="text/javascript"></script>
+  <script src="shared.js" type="text/javascript"></script>
+  <script src="fontfaceobserver.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Luckiest+Guy');
+    @import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap');
+
+    body {
+      background: linear-gradient( #0033cc, #2299aa);
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="c"></canvas>
+  <script>
+    // load some fonts!
+    loadAndUse("Luckiest Guy");
+    loadAndUse("Share Tech Mono");
+    // audio to be used later
+    var audioRow;
+    var audioTrumpet;
+    var audioCheer;
+    var audioAwww;
+    // how big is my screen?
+    var w = window.innerWidth - 10;
+    var h = window.innerHeight - 18;  // subtract some for no scrollbars
+    // build the canvas
+    var canvas = new fabric.Canvas('c', {
+      width: w,
+      height: h,
+    });
+    canvas.selection = false; // disable group selection
+    ///rect.set('selectable', false); // make object unselectable
+
+    const logLength = 15;
+    var logs = [];
+    // used to log information to both the console as well as on-screen
+    function writeConsole(message) {
+      console.log(message);
+      if (logs.length >= logLength) {
+        logs.shift();
+      }
+      logs.push(""+message);
+      // don't log to screen once the race has started
+      if (state !== "race" && state !== "end") {
+        setLogText();
+      }
+    }
+
+    // simply draws the Solace logo in the top-right
+    function drawLogo() {
+      fabric.Image.fromURL('SolLogo.png', function (img) {
+        img.scale(0.5).set('top', 10).set('left', w - 200);
+        canvas.add(img);
+      });
+    }
+    drawLogo();
+
+    var screenText;
+    function setScreenText(words, size) {
+      var fontSize = 100;
+      // if (size !== undefined) fontSize = size;
+      if (size) fontSize = size;
+      if (screenText) canvas.remove(screenText);
+      screenText = new fabric.Text(words, {
+        fontFamily: 'Luckiest Guy',
+        //fontFamily: 'Arial',
+        //left: 0,
+        //top: 0,
+        fontSize: fontSize,
+        stroke: 'black',
+        strokeWidth: 3,
+        fill: 'white',
+        selectable: false,
+        // width: w,
+        textAlign: 'center',
+      });
+      canvas.add(screenText);
+      screenText.center();
+    }
+
+    var latencyText = "";
+    function setLatencyText(val) {
+      var fontSize = 32;
+      if (latencyText !== "") canvas.remove(latencyText);
+      latencyText = new fabric.Text("Latency: " + val + "ms", {
+        fontFamily: 'Luckiest Guy',
+        left: 10,
+        top: h - 40,
+        fontSize: fontSize,
+        stroke: 'black',
+        //strokeWidth: 2,
+        fill: 'white',
+        selectable: false,
+      });
+      canvas.add(latencyText);
+    }
+
+    var logText;
+    function setLogText() {
+      const fontSize = 24;
+      if (logText) {
+        canvas.remove(logText);
+      }
+      logText = new fabric.Text(logs.join('\n'), {
+        fontFamily: 'monospace',// 'Share Tech Mono',
+        fontWeight: 800,
+        left: 10,
+        top: 10,
+        fontSize: fontSize,
+        stroke: 'black',
+        strokeWidth: 0.25,
+        fill: 'white',
+        selectable: false,
+      });
+      canvas.add(logText);
+    }
+
+
+    function loadAndUse(font) {
+      var myfont = new FontFaceObserver(font)
+      myfont.load().then(function () {
+        // when font is loaded, use it.
+        //canvas.requestRenderAll();
+      }).catch(function (e) {
+        writeConsole.log(e)
+        alert('font loading failed ' + font);
+      });
+    }
+
+    // every app gets its own unique ID, which will be used for it "inbox" subscription
+    var uniqueID = "" + (Math.random() + 1).toString(36).substring(2, 10);  // 8 "random" [0-9a-z]
+    var meetID;
+    // grab the URL parameters, everything after the '&'
+    var params = window.location.search.substring(1).split('&')[0]; // first element of split
+    audioCheer = new Audio('cheer.mp3');
+    if (params !== "") {  // if there's something there...
+      mode = 'meet';  // this is a race controller
+      meetID = uniqueID;//
+      audioTrumpet = new Audio('winners-trumpet.mp3');  // load the trumpet sound
+    } else {
+      mode = 'boat';  // else, we're a boat/player
+      audioRow = new Audio('row.mp3');
+      audioAwww = new Audio('sad.mp3');
+    }
+    canvas.on('mouse:down', function (options) {
+      click();
+    });
+
+    //meetID = "mwtk4nfk";
+    var isMobile = detectMobile();  // from shared.js
+    // let's do some logging...
+    writeConsole("UniqueID: " + uniqueID);
+    if (mode === 'meet') {
+      writeConsole("MeetID: " + meetID);
+    }
+    writeConsole("Is phone? " + isMobile);
+    writeConsole("Mode: '" + mode + "'");
+
+    // setup, prep (players can join, teams get chosen), starting in 5 seconds, racing, end of race
+    // MEET: setup, prep, marks, race, end
+    // BOAT: setup, prep, marks, race, end
+    var state = "setup";
+    var meetName = "";
+    if (mode === 'meet') {
+      // assign here with a input box
+      //meetName = "Dev Jam race!";
+      meetName = prompt("Please enter the race name", "Dev Jam Race!");
+      writeConsole("Race name: "+meetName);
+    }
+    var teams = ["pink", "green", "yellow", "orange"];
+    boatImg = {};
+    for (color in teams) {
+      var img = new Image();
+      img.src = "boat" + color + ".png";
+      boatImg[teams[color]] = img;
+    }
+    var raceID;  // per-race unique ID
+    // meet vars:
+    var curPlayers = {};
+    var totalClicksByPlayer = {};
+    var teamPointer = 0;
+    var curTeams = {};
+    for (color in teams) {
+      curTeams[teams[color]] = new Set();
+    }
+    var notReadyPlayers;
+    var nextPlayers = new Set();
+    // boat vars:
+    var myTeam;
+
+    var isConnected = false;
+    writeConsole("Connecting...");
+    var client = getClientConnection(uniqueID,onMessageArrived,onConnectionLost,onConnect);
+
+    // called when the client connects
+    function onConnect() {
+      writeConsole("Connected!");
+      if (mode === 'meet') {  // this is the race controller
+        client.subscribe("boat/meet/" + meetID + "/#");  // is meet catch-all
+        client.subscribe("boat/meet/query");
+        meetSwitchToPrep();
+      } else {  // this is a player (boat)
+        client.subscribe("boat/player/" + uniqueID + "/#");  // subscribe to his unique topics
+        var message = new Paho.MQTT.Message(uniqueID);
+        message.destinationName = "boat/meet/query";
+        sendMessage(message);  // find out what meets there are
+        writeConsole("Just published looking for races");
+      }
+      client.subscribe("boat/timing/" + uniqueID);
+
+      if (isMobile) {
+      } else {
+      }
+      isConnected = true;
+    }
+
+    // called when the client loses its connection
+    function onConnectionLost(responseObject) {
+      isConnected = false;
+      if (responseObject.errorCode !== 0) {
+        writeConsole("Connection Lost! " + responseObject.errorMessage);
+      }
+      setLatencyText("--");  // to show no connectivity
+    }
+
+    // called when a message arrives
+    function onMessageArrived(msg) {
+      if (msg.destinationName == "boat/timing/" + uniqueID) {
+        updateLatency(msg.payloadString);
+      } else {
+        if (mode === 'meet') {
+          meetMessageArrived(msg);
+        } else {
+          writeConsole("-> [MSG RECV] topic='"+msg.destinationName+"'; payload='"+msg.payloadString+"'");
+          boatMessageArrived(msg);
+        }
+      }
+    }
+
+    function sendMessage(msg) {
+      if (mode === 'boat') {
+        writeConsole("<- [MSG SENT] topic='"+msg.destinationName+"'; payload='"+msg.payloadString+"'");
+      }
+      client.send(msg);
+    }
+
+    // called when a message arrives
+    function meetMessageArrived(msg) {
+      var topic = msg.destinationName;
+      if (topic === "boat/meet/query") {  // always reply with our details
+        // QUERY to find out my race ID and NAME
+        var payload = { meetID: meetID, meetName: meetName };
+        var reply = new Paho.MQTT.Message(JSON.stringify(payload));
+        reply.destinationName = "boat/player/" + msg.payloadString + "/query";
+        sendMessage(reply);  // reply to the player
+      } else if (topic === "boat/meet/" + meetID + "/join") {  // always reply with our details
+        // JOIN request, to join this race
+        switch (state) {
+          // just getting ready, add them in!
+          case "prep":
+            assignPlayer(msg.payloadString);
+            sendPrepMessage(msg.payloadString);
+            setScreenText("" + Object.keys(curPlayers).length + " Joined");
+            break;
+          // otherwise, wait to the next race
+          default:
+            nextPlayers.add(msg.payloadString);
+            var meetDeets = { meetID: meetID, meetName: meetName };
+            var reply = new Paho.MQTT.Message(JSON.stringify(meetDeets));
+            reply.destinationName = "boat/player/" + msg.payloadString + "/join";
+            sendMessage(reply);
+            writeConsole("Added " + msg.payloadString + " to next race.");
+            break;
+        }
+      } else if (topic === "boat/meet/" + meetID + "/prep") {  // for remote control
+        meetSwitchToPrep();
+      } else if (topic === "boat/meet/" + meetID + "/marks") {  // for remote control, instead of clicking
+        meetOnYourMarks();
+      } else if (topic === "boat/meet/" + raceID + "/ready") {  // from the player saying they're good to go!
+        playerReady(msg.payloadString);
+      } else if (topic.startsWith("boat/meet/" + raceID + "/row")) {
+        if (state !== "race") return;
+        var levels = topic.split("/");
+        var team = levels[4];
+        var uniqueID = levels[5];
+        pointsNeeded[team]--;
+        totalClicksByPlayer[uniqueID]++;
+        // is the race won? game over?
+        if (pointsNeeded[team] === 0) {
+          changeState("end");
+          writeConsole(team + " WON THE RACE");
+          audioCheer.play();
+          // ok, sort all the players by total # of clicks
+          var ps = [];
+          for (var key in Object.keys(curPlayers)) {
+            var player = Object.keys(curPlayers)[key];
+            ps.push({ name: player, val: totalClicksByPlayer[player] });
+          }
+          ps.sort(function (a, b) {
+            return b.val - a.val;
+          });
+          console.log(ps);
+          // sort the teams by their ratios to determine who won
+          var ratios = meetCalcRatios();
+          var ratiosA = [];
+          for (var key in Object.keys(ratios)) {
+            var t = teams[key];
+            ratiosA.push({ team: t, val: ratios[t] });
+          }
+          ratiosA.sort(function (a, b) {
+            return b.val - a.val;
+          });
+          console.log(ratiosA);
+  
+          meetBroadcastStats();
+          setScreenText(team + ' Team Wins!!', 120);
+          var endMsg;
+          endMsg =  { winningTeam: team, ranking: ps };
+          //if (ps.length >= 3) endMsg = { team: team, winners: [ps[0].name, ps[1].name, ps[2].name] };
+          //else if (ps.length >= 2) endMsg = { team: team, winners: [ps[0].name, ps[1].name] };
+          //else endMsg = { team: team, winners: [ps[0].name] };
+          console.log(endMsg);
+          var msg = new Paho.MQTT.Message(JSON.stringify(endMsg));
+          msg.destinationName = "boat/race/" + raceID + "/end";
+          sendMessage(msg);
+          var final = "Most clicks: " + ps[0].val;
+          if (ps.length >= 3) final += "\n2nd most: " + ps[1].val;
+          if (ps.length >= 4) final += "\n3rd most: " + ps[2].val;
+          if (ps.length >= 2) final += "\nWorst clicker: " + ps[ps.length - 1].val;
+
+          setTimeout(setScreenText, 5000, final);
+	  //setTimeout(meetSwitchToPrep, 10000);
+        }
+      }
+    }
+
+
+    function prv_changeState(newState) {
+      state = newState;
+      writeConsole("Switching state from '" + state + "' to '" + newState + "'");
+    }
+
+    // controls the state engine, used by both 'meet' and 'boat'
+    // states are: [setup, prep, marks, race, end]
+    function changeState(newState) {
+      switch (newState) {
+        case "setup":  // you should never switch into setup: starts this way... or go from end->prep
+          break;
+        case "prep":
+          if (state == "setup" || state === "end" || state === "marks") {
+            prv_changeState(newState);
+            return true;
+          }
+          break;
+        case "marks":
+          if (state === "prep" && (mode === 'meet' && Object.keys(curPlayers).length > 0)) {
+            prv_changeState(newState);
+            return true;
+          }
+          break;
+        case "race":
+          if (state === "marks") {
+            if (mode === 'meet' && Object.keys(curPlayers).length > 0) {
+              prv_changeState(newState);
+              return true;
+            } else {
+              writeConsole("No active players!! Going back to prep mode");
+              meetSwitchToPrep();
+              return false;
+            }
+          }
+          break;
+        case "end":
+          if (state === "race") {
+            prv_changeState(newState);
+            return true;
+          }
+          break;
+        default:
+          writeConsole("Unknown state transition: " + newState);
+      }
+      writeConsole("State switch from " + state + " to " + newState + " failed!");
+      return false;
+    }
+
+    function meetSwitchToPrep() {
+      if (changeState("prep")) {
+        setScreenText('Waiting for Players!');
+        // add some temporary text to show the URL
+        var urlText = new fabric.Text("sg.solace.com/db", {
+          fontFamily: 'monospace',
+          fontWeight: '900',
+          top: 3 * h / 5,
+          fontSize: 100,
+          stroke: 'black',
+          strokeWidth: 3,
+          fill: 'white',
+          selectable: false,
+        });
+        canvas.add(urlText);
+        urlText.centerH();
+        // generate a new raceID for this upcoming race
+        raceID = "" + (Math.random() + 1).toString(36).substring(2, 10);  // 8 "random" [0-9a-z]
+        // all the players that have been waiting to join, add them to this new race and inform them
+        meetCopyPlayers();
+      }
+    }
+
+    const marksTime = 8000
+    // when starting the race..!
+    function meetOnYourMarks() {
+      if (changeState("marks")) {  // make sure we're allowed to change state
+        client.subscribe("boat/meet/" + raceID + "/#");  // add a special race subscription
+        notReadyPlayers = new Set();  // make an empty set...
+        for (var key in Object.keys(curPlayers)) {
+          var player = Object.keys(curPlayers)[key];  // add every player into this empty set
+          notReadyPlayers.add(player);
+        }
+        var ratios = meetCalcRatios();
+        var reply = new Paho.MQTT.Message("GET READY!!!!  5 seconds!");
+        reply.destinationName = "boat/race/" + raceID + "/marks";
+        sendMessage(reply);
+        setTimeout(meetStartRace, marksTime);  // start the cound down!
+        setTimeout(meetFinalPrep, marksTime - 2500);  // 2500ms before the start, make sure the teams are good
+        setTimeout(setScreenText, marksTime - 2000, 'Ready?');
+        setTimeout(setScreenText, marksTime - 1000, 'Set...');
+        setTimeout(setScreenText, marksTime, 'GO!!', 150);
+        setTimeout(setScreenText, marksTime + 100, '');
+        writeConsole("GET READY!");
+        setScreenText('On your marks!');
+        audioTrumpet.play();
+      }
+    }
+
+    function playerReady(player) {
+      notReadyPlayers.delete(player);
+      writeConsole("Player " + player + " on team " + curPlayers[player] + " reports ready!");
+    }
+
+    var pointsNeeded = {};
+    var totalPointsNeeded = {};
+    // whoever hasn't reported ready, kick them off, then define team sizes + race length
+    function meetFinalPrep() {
+      for (let player of notReadyPlayers) {
+        var team = curPlayers[player];
+        writeConsole("Removing inactive player " + player + " from team " + team);
+        delete curPlayers[player];
+        curTeams[team].delete(player);
+      }
+      // all the players left are actually in the race
+      for (var key in Object.keys(curPlayers)) {
+        var player = Object.keys(curPlayers)[key];
+        totalClicksByPlayer[player] = 0;
+      }
+      for (var team in teams) {
+        // need 100 clicks from each player
+        var totalStrokes = 100;
+        pointsNeeded[teams[team]] = totalStrokes * curTeams[teams[team]].size + 1;
+        totalPointsNeeded[teams[team]] = totalStrokes * curTeams[teams[team]].size + 1;
+      }
+      initBoats();
+      //boatBroadcastStats();
+    }
+
+    const updateInterval = 500;
+    // The race has begun!
+    function meetStartRace() {
+      if (changeState("race")) {
+        writeConsole("Race has started");
+        // send out the position stats every 500ms
+        setTimeout(meetBroadcastStatsLoop, updateInterval);
+      }
+    }
+
+    function meetBroadcastStatsLoop() {
+      // as long as the race is on, keep looping
+      if (state !== "race") return;
+      meetBroadcastStats();
+      setTimeout(meetBroadcastStatsLoop, updateInterval);
+    }
+
+    // returns an object with teams and how far they are from starting line to finish line
+    // e.g.: { "pink":0.2, "green":0.7 }
+    function meetCalcRatios() {
+      var ratios = {};
+      for (let k in teams) {
+        var team = teams[k];
+        ratios[team] = 1 - (pointsNeeded[team] / totalPointsNeeded[team]);
+      }
+      return ratios;
+    }
+
+    function meetBroadcastStats() {
+      var ratios = meetCalcRatios();
+      var msg = new Paho.MQTT.Message(JSON.stringify(ratios));
+      msg.destinationName = "boat/race/" + raceID + "/stats";
+      sendMessage(msg);
+      drawBoats(ratios);
+      // console.log(ratios);
+    }
+
+    function resetCanvas() {
+      canvas.clear();
+      drawLogo();
+    }
+
+
+    function click() {
+      if (mode === 'boat') {
+        row();
+      } else {  // meet mode
+        if (state === 'prep') {
+          meetOnYourMarks();
+        }
+      }
+    }
+
+
+    function assignPlayer(player) {
+      var team = teams[(teamPointer++) % 4];
+      curPlayers[player] = team;
+      curTeams[team].add(player);
+      return team;
+    }
+
+    // this is called 
+    // anybody waiting for the next race to start, move them over and inform them
+    function meetCopyPlayers() {
+      for (let player of nextPlayers) {
+        assignPlayer(player);
+        sendPrepMessage(player);
+      }
+    }
+
+    // this tells the players/boats what the next race ID is going to be, and to listen to that topic
+    function sendPrepMessage(player) {
+      var color = curPlayers[player];
+      var raceDeets = { meetID: meetID, meetName: meetName, team: color, raceID: raceID };
+      var reply = new Paho.MQTT.Message(JSON.stringify(raceDeets));
+      reply.destinationName = "boat/player/" + player + "/prep";
+      sendMessage(reply);
+      //console.log(reply);
+      writeConsole("Added " + player + " to team " + color + "!");
+    }
+
+
+    // SHARED FUNCTIONS! //////////////////////////////////////////////////////////////////////
+
+    var boats = [];
+    function initBoats() {
+      canvas.remove(logText);
+      resetCanvas();
+      for (var i = 0; i < 4; i++) {
+        var img = boatImg[teams[i]];
+        var iw = img.width;
+        var ih = img.height;
+        // gotta make this look good on both landscape and portrait
+        var yScale = (h / 6) / ih;
+        var xScale = (w / 3) / iw;
+        var scale = Math.min(xScale, yScale);
+        if (mode === 'boat' && teams[i] === myTeam) scale = scale *= 1.25;;
+        var x = 0;
+        var y = (((2 + 2 * i) * h) / 10) - (ih * scale * 0.5);
+        var imgInstance = new fabric.Image(img, {
+          left: x,
+          top: y,
+          selectable: false,
+        });
+        imgInstance.scale(scale);
+        boats[i] = imgInstance;
+        canvas.add(boats[i]);
+      }
+    }
+
+    // this is used by both the meet and boats
+    function drawBoats(pos) {
+      for (var i = 0; i < 4; i++) {
+        var img = boatImg[teams[i]];
+        var iw = img.width;
+        var ih = img.height;
+        var yScale = (h / 8) / ih;
+        var xScale = (w / 3) / iw;
+        var scale = Math.min(xScale, yScale);
+        // the players will see their own boats 25% larger than the others
+        if (mode === 'boat' && teams[i] === myTeam) scale = scale *= 1.25;
+        var x = pos[teams[i]] * (w - (iw * scale));
+        //var y = (((2 + 2 * i) * h) / 10) - (ih * scale * 0.5);
+        boats[i].animate('left', x, {
+          onChange: canvas.renderAll.bind(canvas),
+          duration: updateInterval - 50,
+          easing: fabric.util.ease.easeOutQuad,
+        });
+      }
+    }
+
+
+
+
+    // BOAT-SPECIFIC FUNCTIONS! //////////////////////////////////////////////////////////////////////
+
+    function boatMessageArrived(msg) {
+      var topic = msg.destinationName;
+      if (topic === "boat/player/" + uniqueID + "/query") {
+      // QUERY response received, should add to list of meets to choose from
+      var payload = JSON.parse(msg.payloadString)
+        var asdf = confirm("Do you want to join the race called: \""+payload.meetName+"\"?");
+        if (!asdf) return;
+        // THIS PART A HACK, WE SHOULD IDEALLY ADD TO A LIST OF RACES, NOT JUST REPLY
+        writeConsole("Ok, heard back from '" + payload.meetName + "', going to join it");
+        var reply = new Paho.MQTT.Message(uniqueID);
+        reply.destinationName = "boat/meet/" + payload.meetID + "/join";
+        sendMessage(reply);  // join this meet!
+        writeConsole("Have requested to join race");
+      } else if (topic === "boat/player/" + uniqueID + "/join") {
+        // JOIN response received, means we can add ourselves to this meet
+        var payload = JSON.parse(msg.payloadString)
+        if (meetName !== "") {
+          writeConsole("Already joined a meet (" + meetName + "), can't join " + payload.name);
+          return;
+        }
+        meetName = payload.meetName;
+        meetID = payload.meetID;
+        writeConsole("Successfully joined '" + meetName + "' meet, standby for next race!");
+	setScreenText("Standby for next race!");
+      } else if (topic === "boat/player/" + uniqueID + "/prep") {
+        var payload = JSON.parse(msg.payloadString)
+        writeConsole("Going to start a race soon! Get ready! I'm on the " + payload.team + " team!");
+        meetName = payload.meetName;
+        meetID = payload.meetID;
+        raceID = payload.raceID;
+        myTeam = payload.team;
+        client.subscribe("boat/race/" + raceID + "/#");
+        var img = boatImg[myTeam];
+        var imgInstance = new fabric.Image(img, {
+          selectable: false,
+        });
+        imgInstance.scale(1.5);
+        canvas.add(imgInstance);
+        imgInstance.centerV();
+        imgInstance.centerH();
+        setScreenText("You're on\n" + myTeam + " team!");
+
+      } else if (topic === "boat/race/" + raceID + "/marks") {
+        // the race is starting... need to confirm I'm ready
+        writeConsole(msg.payloadString);
+        var reply = new Paho.MQTT.Message(uniqueID);
+        reply.destinationName = "boat/meet/" + raceID + "/ready";
+        sendMessage(reply);
+        setTimeout(boatStartRace, marksTime);
+        setTimeout(initBoats, marksTime - 2500);  // 2500ms before the start, make sure the teams are good
+        setScreenText('On your marks!');
+        setTimeout(setScreenText, marksTime - 2000, 'Ready?');
+        setTimeout(setScreenText, marksTime - 1000, 'Set...');
+        setTimeout(setScreenText, marksTime, 'GO!!', 150);
+        setTimeout(setScreenText, marksTime + 500, '');
+        // buzz the phone, if it allows it...
+        var vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+        if (vibrate) {
+          // writeConsole("VAIBRATTE!");
+          navigator.vibrate(1000);
+        }
+      } else if (topic === "boat/race/" + raceID + "/stats") {
+        drawBoats(JSON.parse(msg.payloadString));
+      } else if (topic === "boat/race/" + raceID + "/end") {
+        state = "end";
+        var payload = JSON.parse(msg.payloadString)
+        writeConsole(payload);
+        audioRow.pause();
+        audioRow.currentTime = 0;
+        if (payload.winningTeam === myTeam) {
+          audioCheer.play();
+          setScreenText("Your Team Won!!");
+        } else {
+          audioAwww.play();
+          setScreenText("Your team lost!  :-(");
+        }
+        var ranking = payload['ranking'];
+        for (var i=0;i<ranking.length;i++) {
+          if (ranking[i]['name'] == uniqueID) {
+            setTimeout(setScreenText, 5000, "You ranked\n#"+(i+1)+" out of "+ranking.length+"\nfor rows!");
+          }
+        }
+      }
+    }
+
+    // boat function
+    function boatStartRace() {
+      if (state === 'meet') return;
+      state = "race";
+      writeConsole("GO!!!!");
+    }
+
+    // boat function
+    function row() {
+      if (state !== "race") return;
+      var msg = new Paho.MQTT.Message(myTeam);
+      msg.destinationName = "boat/meet/" + raceID + "/row/" + myTeam + "/" + uniqueID;
+      sendMessage(msg);
+      audioRow.play();
+    }
+
+
+
+
+
+
+
+
+
+
+    // LATENCY TIMING FUNCTIONS! //////////////////////////////////////////////////////////////////////
+
+    // anonymous function to send latency/timing messages every second
+    setInterval(function () {
+      if (!isConnected) return;
+      var timestamp = "" + Date.now();
+      var message = new Paho.MQTT.Message(timestamp);
+      message.destinationName = "boat/timing/" + uniqueID;
+      client.send(message);
+    }, 1000);
+
+    // when a timing message is received, update the displayed text
+    function updateLatency(ts) {
+      var delta = Date.now() - ts;
+      setLatencyText(delta.toFixed(0));
+    }
+
+
+  </script>
+</body>
+
+</html>
