@@ -1,0 +1,2 @@
+# ignore iupdates to this file, since we're probably updating the MQTT server credentials
+lib/shared.js
