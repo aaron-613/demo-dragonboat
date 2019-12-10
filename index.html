@@ -19,6 +19,7 @@
 <body>
   <canvas id="c"></canvas>
   <script>
+    const URL_TO_DISPLAY = "sg.solace.com/db";
     // load some fonts!
     loadAndUse("Luckiest Guy");
     loadAndUse("Share Tech Mono");
@@ -394,7 +395,7 @@
       if (changeState("prep")) {
         setScreenText('Waiting for Players!');
         // add some temporary text to show the URL
-        var urlText = new fabric.Text("sg.solace.com/db", {
+        var urlText = new fabric.Text(URL_TO_DISPLAY, {
           fontFamily: 'monospace',
           fontWeight: '900',
           top: 3 * h / 5,
