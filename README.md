@@ -13,7 +13,7 @@ A simple, fun JavaScript game that uses MQTT to have a dragon boat race
    * For example: `http://sg.solace.com/db/index.html?aaron`
    * You will notice a "latency" timer displayed in the bottom corner. This indicates RTT to the MQTT broker and back. Lower numbers indicate more responsive interactions.
 1. That will start the race... I always suggest going into Full-Screen mode (F11 on Windows) and reloading
-1. Participants can now join the race using the URL displayed on the screen
+1. Participants can now join the race (phone or laptop) using the URL displayed on the screen
 1. When enough participants have joined, the Presenter clicks anywhere on the background to start the race
 1. Participants are given a countdown, after which they simply have to click anywhere on the background, or tap their finger on the background if on a phone
 
