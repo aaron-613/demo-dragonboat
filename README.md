@@ -18,5 +18,5 @@ A simple, fun JavaScript game that uses MQTT to have a dragon boat race
 1. Participants are given a countdown, after which they simply have to click anywhere on the background, or tap their finger on the background if on a phone
 
 # Licences
-There are a bunch of various licenses in the JavaScript libs I use.  I should check to make sure I can distribute them or whatever.
 
+Check the LICENSE file
