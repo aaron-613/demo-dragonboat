@@ -53,15 +53,18 @@
         setLogText();
       }
     }
-
-    // simply draws the Solace logo in the top-right
-    function drawLogo() {
+    function drawLogo(mode) {
       fabric.Image.fromURL('gfx/SolLogo.png', function (img) {
         img.scale(0.5).set('top', 10).set('left', w - 200);
         canvas.add(img);
       });
+      if (mode == 'meet') {
+        fabric.Image.fromURL('gfx/qr.png', function (img) {
+          img.scale(0.8).set('top', h-130).set('left', w-130);
+          canvas.add(img);
+        });
+      }
     }
-    drawLogo();
 
     var screenText;
     function setScreenText(words, size) {
@@ -141,15 +144,18 @@
     // grab the URL parameters, everything after the '&'
     var params = window.location.search.substring(1).split('&')[0]; // first element of split
     audioCheer = new Audio('audio/cheer.mp3');
+    audioTrumpet = new Audio('audio/winners-trumpet.mp3');  // load the trumpet sound
+    var meet;
     if (params !== "") {  // if there's something there...
       mode = 'meet';  // this is a race controller
       meetID = uniqueID;//
-      audioTrumpet = new Audio('audio/winners-trumpet.mp3');  // load the trumpet sound
+      //audioTrumpet = new Audio('audio/winners-trumpet.mp3');  // load the trumpet sound
     } else {
       mode = 'boat';  // else, we're a boat/player
       audioRow = new Audio('audio/row.mp3');
       audioAwww = new Audio('audio/sad.mp3');
     }
+    drawLogo(mode);
     canvas.on('mouse:down', function (options) {
       click();
     });
@@ -174,6 +180,8 @@
       //meetName = "Dev Jam race!";
       meetName = prompt("Please enter the race name", "Dev Jam Race!");
       writeConsole("Race name: "+meetName);
+      //var numTeams = prompt("How many teams do you want? [2-4]", "4");
+      //writeConsole("Teams: "+numTeams);
     }
     var teams = ["pink", "green", "yellow", "orange"];
     boatImg = {};
@@ -198,11 +206,11 @@
 
     var isConnected = false;
     writeConsole("Connecting...");
-    var client = getClientConnection(uniqueID,onMessageArrived,onConnectionLost,onConnect);
+    var client = getClientConnection(uniqueID,onMessageArrived,onConnectionLost,onConnect,mode);
 
     // called when the client connects
     function onConnect() {
-      writeConsole("Connected!");
+      writeConsole("Connected to "+client.host+"!");
       if (mode === 'meet') {  // this is the race controller
         client.subscribe("boat/meet/" + meetID + "/#");  // is meet catch-all
         client.subscribe("boat/meet/query");
@@ -348,8 +356,9 @@
       writeConsole("Switching state from '" + state + "' to '" + newState + "'");
     }
 
-    // controls the state engine, used by both 'meet' and 'boat'
+    // controls the state engine, used by both modes: 'meet' and 'boat'
     // states are: [setup, prep, marks, race, end]
+    // this would be much better using a proper state machine
     function changeState(newState) {
       switch (newState) {
         case "setup":  // you should never switch into setup: starts this way... or go from end->prep
@@ -509,7 +518,7 @@
 
     function resetCanvas() {
       canvas.clear();
-      drawLogo();
+      drawLogo(mode);
     }
 
 
@@ -550,6 +559,14 @@
       //console.log(reply);
       writeConsole("Added " + player + " to team " + color + "!");
     }
+
+
+
+
+
+
+
+
 
 
     // SHARED FUNCTIONS! //////////////////////////////////////////////////////////////////////
@@ -604,6 +621,12 @@
 
 
 
+
+
+
+
+
+
     // BOAT-SPECIFIC FUNCTIONS! //////////////////////////////////////////////////////////////////////
 
     function boatMessageArrived(msg) {
@@ -611,6 +634,7 @@
       if (topic === "boat/player/" + uniqueID + "/query") {
       // QUERY response received, should add to list of meets to choose from
       var payload = JSON.parse(msg.payloadString)
+        if (meetName != "") return;
         var asdf = confirm("Do you want to join the race called: \""+payload.meetName+"\"?");
         if (!asdf) return;
         // THIS PART A HACK, WE SHOULD IDEALLY ADD TO A LIST OF RACES, NOT JUST REPLY
@@ -619,18 +643,18 @@
         reply.destinationName = "boat/meet/" + payload.meetID + "/join";
         sendMessage(reply);  // join this meet!
         writeConsole("Have requested to join race");
-      } else if (topic === "boat/player/" + uniqueID + "/join") {
+      } else if (topic == "boat/player/" + uniqueID + "/join") {
         // JOIN response received, means we can add ourselves to this meet
         var payload = JSON.parse(msg.payloadString)
-        if (meetName !== "") {
+        if (meetName != "") {
           writeConsole("Already joined a meet (" + meetName + "), can't join " + payload.name);
           return;
         }
         meetName = payload.meetName;
         meetID = payload.meetID;
         writeConsole("Successfully joined '" + meetName + "' meet, standby for next race!");
-	setScreenText("Standby for next race!");
-      } else if (topic === "boat/player/" + uniqueID + "/prep") {
+	setScreenText("Standby for\nnext race!");
+      } else if (topic == "boat/player/" + uniqueID + "/prep") {
         var payload = JSON.parse(msg.payloadString)
         writeConsole("Going to start a race soon! Get ready! I'm on the " + payload.team + " team!");
         meetName = payload.meetName;
@@ -663,6 +687,7 @@
         setTimeout(setScreenText, marksTime + 500, '');
         // buzz the phone, if it allows it...
         var vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+        audioTrumpet.play();
         if (vibrate) {
           // writeConsole("VAIBRATTE!");
           navigator.vibrate(1000);
@@ -704,6 +729,8 @@
       var msg = new Paho.MQTT.Message(myTeam);
       msg.destinationName = "boat/meet/" + raceID + "/row/" + myTeam + "/" + uniqueID;
       sendMessage(msg);
+      audioRow.pause();
+      audioRow.currentTime = 0;
       audioRow.play();
     }
 
