@@ -1,0 +1,768 @@
+{
+  "applicationDomains": [
+    {
+      "createdTime": 1612159186265,
+      "updatedTime": 1612159186265,
+      "createdBy": "67tr8tku41",
+      "changedBy": "67tr8tku41",
+      "id": "1a2mpvr6rwcv",
+      "name": "Dragon Boat",
+      "topicDomain": "boat",
+      "description": "This is my dragon boat demo:\n\nRace Contoller: https://sg.solace.com/db/index.html?aaron\n\nCode: https://github.com/SolaceLabs/demo-dragonboat\n\nTopic Discovery scan (2 players): https://sg.solace.com/boat/",
+      "enforceUniqueTopicNames": true,
+      "events": [
+        {
+          "createdTime": 1612182028476,
+          "updatedTime": 1612182028476,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rzc3",
+          "name": "Row",
+          "version": "0.0.1",
+          "shared": false,
+          "description": "UNIDIRECTIONAL\n\nEVENT\n\n  \n\nEach and every time a player rows, this event is sent",
+          "schemaId": null,
+          "schemaVersionId": null,
+          "keySchemaId": null,
+          "keySchemaVersionId": null,
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "revisionNumber": 1,
+          "keyPrimitivePayloadType": null,
+          "valuePrimitivePayloadType": null,
+          "topicAddress": {
+            "id": "22fraf8vrsqz",
+            "virtualBrokerId": "22fraf7wyalb",
+            "topicAddressLevels": [
+              {
+                "id": "22fraf8vrqhv",
+                "consumable": false,
+                "name": "boat",
+                "displayName": "boat",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqi5",
+                "consumable": false,
+                "name": "meet",
+                "displayName": "meet",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrsr9",
+                "consumable": false,
+                "name": "${raceId}",
+                "displayName": "${raceId}",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrsrj",
+                "consumable": false,
+                "name": "row",
+                "displayName": "row",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrsrt",
+                "consumable": false,
+                "name": "${teamCol}",
+                "displayName": "${teamCol}",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrss3",
+                "consumable": true,
+                "name": "${playerId}",
+                "displayName": "${playerId}",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              }
+            ],
+            "type": "topicAddress"
+          },
+          "type": "event"
+        },
+        {
+          "createdTime": 1612161945298,
+          "updatedTime": 1612161945298,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rxst",
+          "name": "MeetQueryResponse",
+          "version": "0.0.1",
+          "shared": false,
+          "description": "REPLY\n\nEVENT: triggered when receiving a meet query from a player\n\n  \n\nWhat the controller sends back to a player via a \"reply to\" topic, with the details of this meetup.",
+          "schemaId": null,
+          "schemaVersionId": null,
+          "keySchemaId": null,
+          "keySchemaVersionId": null,
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "revisionNumber": 1,
+          "keyPrimitivePayloadType": null,
+          "valuePrimitivePayloadType": null,
+          "topicAddress": {
+            "id": "22fraf8vrrxj",
+            "virtualBrokerId": "22fraf7wyalb",
+            "topicAddressLevels": [
+              {
+                "id": "22fraf8vrqhv",
+                "consumable": false,
+                "name": "boat",
+                "displayName": "boat",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqvh",
+                "consumable": false,
+                "name": "player",
+                "displayName": "player",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqvr",
+                "consumable": false,
+                "name": "${playerId}",
+                "displayName": "${playerId}",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrrxt",
+                "consumable": true,
+                "name": "query",
+                "displayName": "query",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              }
+            ],
+            "type": "topicAddress"
+          },
+          "type": "event"
+        },
+        {
+          "createdTime": 1612159298955,
+          "updatedTime": 1612162157345,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rwdf",
+          "name": "MeetQueryRequest",
+          "version": "0.0.1",
+          "shared": false,
+          "description": "REQUEST\n\nEVENT",
+          "schemaId": null,
+          "schemaVersionId": null,
+          "keySchemaId": null,
+          "keySchemaVersionId": null,
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "revisionNumber": 3,
+          "keyPrimitivePayloadType": null,
+          "valuePrimitivePayloadType": null,
+          "topicAddress": {
+            "id": "22fraf8vrqhl",
+            "virtualBrokerId": "22fraf7wyalb",
+            "topicAddressLevels": [
+              {
+                "id": "22fraf8vrqhv",
+                "consumable": false,
+                "name": "boat",
+                "displayName": "boat",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqi5",
+                "consumable": false,
+                "name": "meet",
+                "displayName": "meet",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqif",
+                "consumable": true,
+                "name": "query",
+                "displayName": "query",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              }
+            ],
+            "type": "topicAddress"
+          },
+          "type": "event"
+        },
+        {
+          "createdTime": 1612160883380,
+          "updatedTime": 1612181374054,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rxex",
+          "name": "PlayerReady",
+          "version": "0.0.1",
+          "shared": false,
+          "description": "The player indicates that it is ready for the race. Used to determine if players have \"left\" between the \\_prep\\_ and \\_marks\\_ phases.",
+          "schemaId": null,
+          "schemaVersionId": null,
+          "keySchemaId": null,
+          "keySchemaVersionId": null,
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "revisionNumber": 2,
+          "keyPrimitivePayloadType": null,
+          "valuePrimitivePayloadType": null,
+          "topicAddress": {
+            "id": "22fraf8vrrk7",
+            "virtualBrokerId": "22fraf7wyalb",
+            "topicAddressLevels": [
+              {
+                "id": "22fraf8vrqhv",
+                "consumable": false,
+                "name": "boat",
+                "displayName": "boat",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqi5",
+                "consumable": false,
+                "name": "meet",
+                "displayName": "meet",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrrkh",
+                "consumable": false,
+                "name": "{$meetId}",
+                "displayName": "{$meetId}",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrrkr",
+                "consumable": true,
+                "name": "ready",
+                "displayName": "ready",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              }
+            ],
+            "type": "topicAddress"
+          },
+          "type": "event"
+        },
+        {
+          "createdTime": 1612161483174,
+          "updatedTime": 1612161784507,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rxr5",
+          "name": "LatencyCheck",
+          "version": "0.0.1",
+          "shared": false,
+          "description": "NO REPLY\n\nPERIODIC\n\n  \n\nUsed to calculate approximate round-trip time to the broker. No practical purpose, just displayed on-screen in the BL corner.",
+          "schemaId": null,
+          "schemaVersionId": null,
+          "keySchemaId": null,
+          "keySchemaVersionId": null,
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "revisionNumber": 2,
+          "keyPrimitivePayloadType": null,
+          "valuePrimitivePayloadType": null,
+          "topicAddress": {
+            "id": "22fraf8vrrwf",
+            "virtualBrokerId": "22fraf7wyalb",
+            "topicAddressLevels": [
+              {
+                "id": "22fraf8vrqhv",
+                "consumable": false,
+                "name": "boat",
+                "displayName": "boat",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrrwp",
+                "consumable": false,
+                "name": "timing",
+                "displayName": "timing",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrrwz",
+                "consumable": true,
+                "name": "${playerId}",
+                "displayName": "${playerId}",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              }
+            ],
+            "type": "topicAddress"
+          },
+          "type": "event"
+        },
+        {
+          "createdTime": 1612159348031,
+          "updatedTime": 1612161830265,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rwpd",
+          "name": "JoinMeetRequest",
+          "version": "0.0.1",
+          "shared": false,
+          "description": "",
+          "schemaId": null,
+          "schemaVersionId": null,
+          "keySchemaId": null,
+          "keySchemaVersionId": null,
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "revisionNumber": 2,
+          "keyPrimitivePayloadType": null,
+          "valuePrimitivePayloadType": null,
+          "topicAddress": {
+            "id": "22fraf8vrqu3",
+            "virtualBrokerId": "22fraf7wyalb",
+            "topicAddressLevels": [
+              {
+                "id": "22fraf8vrqhv",
+                "consumable": false,
+                "name": "boat",
+                "displayName": "boat",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqi5",
+                "consumable": false,
+                "name": "meet",
+                "displayName": "meet",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqud",
+                "consumable": false,
+                "name": "${meetId}",
+                "displayName": "${meetId}",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqun",
+                "consumable": true,
+                "name": "join",
+                "displayName": "join",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              }
+            ],
+            "type": "topicAddress"
+          },
+          "type": "event"
+        },
+        {
+          "createdTime": 1612182205414,
+          "updatedTime": 1612182205414,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rzdr",
+          "name": "RaceFinishUpdate",
+          "version": "0.0.1",
+          "shared": false,
+          "description": "UNIDIRECTIONAL\n\nEVENT\n\n  \n\nWhen the first team to \"cross the finish line\" does, the race controller changes state to an 'end' state, and sends out the rankings to all players.",
+          "schemaId": null,
+          "schemaVersionId": null,
+          "keySchemaId": null,
+          "keySchemaVersionId": null,
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "revisionNumber": 1,
+          "keyPrimitivePayloadType": null,
+          "valuePrimitivePayloadType": null,
+          "topicAddress": {
+            "id": "22fraf8vrsth",
+            "virtualBrokerId": "22fraf7wyalb",
+            "topicAddressLevels": [
+              {
+                "id": "22fraf8vrqhv",
+                "consumable": false,
+                "name": "boat",
+                "displayName": "boat",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrr7z",
+                "consumable": false,
+                "name": "race",
+                "displayName": "race",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrr89",
+                "consumable": false,
+                "name": "${raceId}",
+                "displayName": "${raceId}",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrstr",
+                "consumable": true,
+                "name": "end",
+                "displayName": "end",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              }
+            ],
+            "type": "topicAddress"
+          },
+          "type": "event"
+        },
+        {
+          "createdTime": 1612159445730,
+          "updatedTime": 1612162325825,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rwq7",
+          "name": "PlayerRacePrep aka join meet response",
+          "version": "0.0.1",
+          "shared": false,
+          "description": "NO REPLY\n\nEVENT: triggered by controller moving into \"prep\" state.\n\n  \n\nThe next race will be starting soon... this message assigns a player to a race, as well as a team colour. Any queued players that joined during the previous race should get assigned a team now.",
+          "schemaId": null,
+          "schemaVersionId": null,
+          "keySchemaId": null,
+          "keySchemaVersionId": null,
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "revisionNumber": 5,
+          "keyPrimitivePayloadType": null,
+          "valuePrimitivePayloadType": null,
+          "topicAddress": {
+            "id": "22fraf8vrqv7",
+            "virtualBrokerId": "22fraf7wyalb",
+            "topicAddressLevels": [
+              {
+                "id": "22fraf8vrqhv",
+                "consumable": false,
+                "name": "boat",
+                "displayName": "boat",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqvh",
+                "consumable": false,
+                "name": "player",
+                "displayName": "player",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqvr",
+                "consumable": false,
+                "name": "${playerId}",
+                "displayName": "${playerId}",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrqw1",
+                "consumable": true,
+                "name": "prep",
+                "displayName": "prep",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              }
+            ],
+            "type": "topicAddress"
+          },
+          "type": "event"
+        },
+        {
+          "createdTime": 1612159592090,
+          "updatedTime": 1612159592090,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rx2z",
+          "name": "OnYourMarks",
+          "version": "0.0.1",
+          "shared": false,
+          "description": "Sent just before the race is about to start. Countdown!",
+          "schemaId": null,
+          "schemaVersionId": null,
+          "keySchemaId": null,
+          "keySchemaVersionId": null,
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "revisionNumber": 1,
+          "keyPrimitivePayloadType": null,
+          "valuePrimitivePayloadType": null,
+          "topicAddress": {
+            "id": "22fraf8vrr7p",
+            "virtualBrokerId": "22fraf7wyalb",
+            "topicAddressLevels": [
+              {
+                "id": "22fraf8vrqhv",
+                "consumable": false,
+                "name": "boat",
+                "displayName": "boat",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrr7z",
+                "consumable": false,
+                "name": "race",
+                "displayName": "race",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrr89",
+                "consumable": false,
+                "name": "${raceId}",
+                "displayName": "${raceId}",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrr8j",
+                "consumable": true,
+                "name": "marks",
+                "displayName": "marks",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              }
+            ],
+            "type": "topicAddress"
+          },
+          "type": "event"
+        },
+        {
+          "createdTime": 1612182101735,
+          "updatedTime": 1612182101735,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rzcx",
+          "name": "StatsRankings",
+          "version": "0.0.1",
+          "shared": false,
+          "description": "UNIDIRECTIONAL\n\nPERIODIC (stats)\n\n  \n\nEvery ~500ms, updated positoins of the boats are broadcast to every player.",
+          "schemaId": null,
+          "schemaVersionId": null,
+          "keySchemaId": null,
+          "keySchemaVersionId": null,
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "revisionNumber": 1,
+          "keyPrimitivePayloadType": null,
+          "valuePrimitivePayloadType": null,
+          "topicAddress": {
+            "id": "22fraf8vrssn",
+            "virtualBrokerId": "22fraf7wyalb",
+            "topicAddressLevels": [
+              {
+                "id": "22fraf8vrqhv",
+                "consumable": false,
+                "name": "boat",
+                "displayName": "boat",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrr7z",
+                "consumable": false,
+                "name": "race",
+                "displayName": "race",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrr89",
+                "consumable": false,
+                "name": "${raceId}",
+                "displayName": "${raceId}",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              },
+              {
+                "id": "22fraf8vrssx",
+                "consumable": true,
+                "name": "stats",
+                "displayName": "stats",
+                "description": "",
+                "children": [],
+                "topicNodeType": "literal",
+                "type": "topicNode"
+              }
+            ],
+            "type": "topicAddress"
+          },
+          "type": "event"
+        }
+      ],
+      "applications": [
+        {
+          "createdTime": 1612180875468,
+          "updatedTime": 1634924820039,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rz7x",
+          "name": "PlayerBoat",
+          "version": "0.0.1",
+          "description": "",
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "producedEventIds": [
+            "1a2mpvr6rwdf",
+            "1a2mpvr6rwpd",
+            "1a2mpvr6rxex",
+            "1a2mpvr6rxr5",
+            "1a2mpvr6rzc3"
+          ],
+          "consumedEventIds": [
+            "1a2mpvr6rwq7",
+            "1a2mpvr6rx2z",
+            "1a2mpvr6rxr5",
+            "1a2mpvr6rxst",
+            "1a2mpvr6rzcx",
+            "1a2mpvr6rzdr"
+          ],
+          "revisionNumber": 6,
+          "applicationClass": "unspecified",
+          "endpoints": [],
+          "type": "application"
+        },
+        {
+          "createdTime": 1612181081276,
+          "updatedTime": 1634924856567,
+          "createdBy": "67tr8tku41",
+          "changedBy": "67tr8tku41",
+          "id": "1a2mpvr6rz91",
+          "name": "RaceController",
+          "version": "0.0.1",
+          "description": "",
+          "applicationDomainId": "1a2mpvr6rwcv",
+          "producedEventIds": [
+            "1a2mpvr6rwq7",
+            "1a2mpvr6rx2z",
+            "1a2mpvr6rxr5",
+            "1a2mpvr6rxst",
+            "1a2mpvr6rzcx",
+            "1a2mpvr6rzdr"
+          ],
+          "consumedEventIds": [
+            "1a2mpvr6rwdf",
+            "1a2mpvr6rwpd",
+            "1a2mpvr6rxex",
+            "1a2mpvr6rxr5",
+            "1a2mpvr6rzc3"
+          ],
+          "revisionNumber": 5,
+          "applicationClass": "unspecified",
+          "endpoints": [],
+          "type": "application"
+        }
+      ],
+      "type": "applicationDomain"
+    }
+  ],
+  "virtualBrokers": [
+    {
+      "createdTime": 1618067179254,
+      "updatedTime": 1618067179254,
+      "createdBy": "1",
+      "changedBy": "1",
+      "id": "22fraf7wyalb",
+      "name": "Default Solace Event Mesh",
+      "description": "The default Solace Event Mesh",
+      "brokerType": "solace",
+      "levelDelimiter": "/",
+      "topicNodes": [],
+      "type": "virtualBroker"
+    }
+  ],
+  "topicValueSets": [],
+  "formatVersion": "1",
+  "type": "ApplicationDomainExport"
+}
