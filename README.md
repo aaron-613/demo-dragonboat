@@ -22,7 +22,7 @@ A simple, fun JavaScript game that uses MQTT to have a dragon boat race
 
 It's already setup on my demo server.
 
-- Point your (desktop) browser to https://sg.solace.com/db/index.html?UNIQUE-NAME-HERE
+- Point your (desktop) browser to `https://sg.solace.com/db/index.html?UNIQUE-NAME-HERE`
    - That browser is the "Race Controller"
    - Give your race a unique name, so you can make sure people join the right race
 - Get your friends to use their phones/tablets to join the race. Goto https://sg.solace.com/db
