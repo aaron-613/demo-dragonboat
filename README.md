@@ -30,6 +30,13 @@ It's already setup on my demo server.
 - Tap your phone background as fast as you can once the race starts
 
 
+## Event Portal Design
+
+![Screenshot](https://github.com/aaron-613/demo-dragonboat/blob/master/pubsub+event-portal/2021-10-22T12-21-48.png "Screenshot")
+
+Check out the `pubsub+event-portal` folder for two ways of visualizing the flow of events and request-reply messages for the game.  Also included are the Event Portal schemas you can import yourself to https://solace.com/products/portal
+
+
 ## Licences
 
 Check the LICENSE file
