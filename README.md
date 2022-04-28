@@ -4,9 +4,12 @@ A simple, fun JavaScript game that uses MQTT to have a dragon boat race
 
 ## Instructions to Install
 1. Load all the files onto a web server somewhere.
-1. Update the credentials for the MQTT connection in the `lib/shared.js` file. Note that you must use a WebSocket connection, and it must be secure `wss://` if hosting on a web server with `https`
+1. Update the credentials for the MQTT connection in the `lib/shared.js` file. Note that you must use a WebSocket connection.  If hosting on a website with `https`, the WebSocket connection must be secure `wss://` (cannot mix secure & non-secure).
    * Sign up for a free Solace Cloud account if you want: https://cloud.solace.com
-   * Use any of the MQTT test servers out there
+   * Use any of the MQTT test servers out there, e.g.:
+       * https://test.mosquitto.org
+       * https://www.hivemq.com/public-mqtt-broker
+       * https://www.emqx.com/en/mqtt/public-mqtt5-broker
 1. Update the displayed URL for players by changing the variable near the top of the `index.html` page
    * For example: `sg.solace.com/db`
 1. Then start a race by pointing your Presenter laptop to the full URL with at least _some additional_ URL parameter
