@@ -3,18 +3,18 @@ A simple, fun JavaScript game that uses MQTT to have a dragon boat race
 ![Screenshot](https://github.com/aaron-613/demo-dragonboat/blob/master/gfx/screenshot.png "Screenshott")
 
 ## Instructions to Install
-1. Load all the files onto a web server somewhere.
+1. Load all the files onto a web server somewhere, e.g. `myserver.org` in folder `boat`
 1. Update the credentials for the MQTT connection in the `lib/shared.js` file. Note that you must use a WebSocket connection.  If hosting on a website with `https`, the WebSocket connection must be secure `wss://` (cannot mix secure & non-secure).
    * Sign up for a free Solace Cloud account if you want: https://cloud.solace.com
    * Use any of the MQTT test servers out there, e.g.:
        * https://test.mosquitto.org
        * https://www.hivemq.com/public-mqtt-broker
        * https://www.emqx.com/en/mqtt/public-mqtt5-broker
-1. Update the displayed URL for players by changing the variable near the top of the `index.html` page:
-   * `  const URL_TO_DISPLAY = "sg.solace.com/db";`
+1. All of the code is inside the `index.html` file.  Update the displayed URL for players by changing the variable near the top of the file:
+   * `  const URL_TO_DISPLAY = "myserver.org/boat";`
 1. Then start a race by pointing your Presenter/Controller laptop to the full URL with at least _some additional_ URL parameter
-   * For example: `http://sg.solace.com/db?aaron`
-   * Give the race a name, which is useful if there are multiple races happening concurrently
+   * For example: `http://myserver.org/boat?race1`
+   * When it loads, you'll be prompted to give the race a name.  This is useful if there are multiple races happening concurrently
    * You will notice a "latency" timer displayed in the bottom corner. This indicates Round Trip Time (RTT) to the MQTT broker and back. Lower numbers indicate more responsive interactions.
 1. That will start the meet... I always suggest going into Full-Screen mode (F11 on Windows) and reloading
 1. Participants can now join the race (phone or laptop) using the URL displayed on the screen
