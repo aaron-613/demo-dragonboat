@@ -10,12 +10,13 @@ A simple, fun JavaScript game that uses MQTT to have a dragon boat race
        * https://test.mosquitto.org
        * https://www.hivemq.com/public-mqtt-broker
        * https://www.emqx.com/en/mqtt/public-mqtt5-broker
-1. Update the displayed URL for players by changing the variable near the top of the `index.html` page
-   * For example: `sg.solace.com/db`
-1. Then start a race by pointing your Presenter laptop to the full URL with at least _some additional_ URL parameter
-   * For example: `http://sg.solace.com/db/index.html?aaron`
-   * You will notice a "latency" timer displayed in the bottom corner. This indicates RTT to the MQTT broker and back. Lower numbers indicate more responsive interactions.
-1. That will start the race... I always suggest going into Full-Screen mode (F11 on Windows) and reloading
+1. Update the displayed URL for players by changing the variable near the top of the `index.html` page:
+   * `  const URL_TO_DISPLAY = "sg.solace.com/db";`
+1. Then start a race by pointing your Presenter/Controller laptop to the full URL with at least _some additional_ URL parameter
+   * For example: `http://sg.solace.com/db?aaron`
+   * Give the race a name, which is useful if there are multiple races happening concurrently
+   * You will notice a "latency" timer displayed in the bottom corner. This indicates Round Trip Time (RTT) to the MQTT broker and back. Lower numbers indicate more responsive interactions.
+1. That will start the meet... I always suggest going into Full-Screen mode (F11 on Windows) and reloading
 1. Participants can now join the race (phone or laptop) using the URL displayed on the screen
 1. When enough participants have joined, the Presenter clicks anywhere on the background to start the race
 1. Participants are given a countdown, after which they simply have to click anywhere on the background, or tap their finger on the background if on a phone
@@ -25,7 +26,7 @@ A simple, fun JavaScript game that uses MQTT to have a dragon boat race
 
 It's already setup on my demo server.
 
-- Point your (desktop) browser to `https://sg.solace.com/db/index.html?UNIQUE-NAME-HERE`
+- Point your (desktop) browser to `https://sg.solace.com/db?UNIQUE-NAME-HERE`
    - That browser is the "Race Controller"
    - Give your race a unique name, so you can make sure people join the right race
 - Get your friends to use their phones/tablets to join the race. Goto https://sg.solace.com/db
